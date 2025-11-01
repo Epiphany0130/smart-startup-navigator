@@ -1,6 +1,18 @@
 spring:
   application:
     name: smart-startup-navigator
+ # springAi
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-plus
+      read-timeout: 600
+  # application-local.yml
+  profiles:
+    active: local
+
 server:
   port: 8456
   servlet:
@@ -23,4 +35,4 @@ springdoc:
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
-      packages-to-scan: com.gyqstd.smartstartupnavigator.controller
+      packages-to-scan: com.gyqstd.smartstartupnavigator.controller, com.gyqstd.smartstartupnavigator.demo
