@@ -10,23 +10,24 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 
-import static com.gyqstd.smartstartupnavigator.constant.Prompt.TOTAL_SYSTEM_PROMPT;
+import static com.gyqstd.smartstartupnavigator.constant.Prompt.BRAND_AND_COPYWRITING_SYSTEM_PROMPT;
+import static com.gyqstd.smartstartupnavigator.constant.Prompt.MARKET_ANALYSIS_SYSTEM_PROMPT;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 @Component
 @Slf4j
-public class SmartStartupNavigator {
+public class MarketAnalysis {
 
     // 注入 ChatClient，支持多轮对话
     private final ChatClient chatClient;
 
-    public SmartStartupNavigator(ChatModel dashscopeChatModel) {
+    public MarketAnalysis(ChatModel dashscopeChatModel) {
         // 初始化基于内存的对话记忆
         ChatMemory chatMemory = new InMemoryChatMemory();
 
         chatClient = ChatClient.builder(dashscopeChatModel)
-                .defaultSystem(TOTAL_SYSTEM_PROMPT)
+                .defaultSystem(MARKET_ANALYSIS_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor()

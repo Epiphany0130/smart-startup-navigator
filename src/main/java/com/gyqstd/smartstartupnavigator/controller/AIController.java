@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/ai")
-public class AiController {
+public class AIController {
 
     @GetMapping("/test")
     public String test() {
