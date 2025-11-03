@@ -15,10 +15,10 @@ public class ToolRegistration {
     @Bean
     public ToolCallback[] allTools() {
         WebSearchTool webSearchTool = new WebSearchTool(searchApiKey);
-        PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
+//        PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
         return ToolCallbacks.from(
-            webSearchTool,
-            pdfGenerationTool
+            webSearchTool
+//            ,pdfGenerationTool
         );
     }
 }

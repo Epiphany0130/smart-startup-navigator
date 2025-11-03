@@ -1,6 +1,7 @@
 package com.gyqstd.smartstartupnavigator.app;
 
 import com.gyqstd.smartstartupnavigator.advisor.MyLoggerAdvisor;
+import com.gyqstd.smartstartupnavigator.constant.Prompt;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -12,12 +13,13 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-import static com.gyqstd.smartstartupnavigator.constant.Prompt.*;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
+
 
 /**
  * 智能创业导航服务
@@ -31,14 +33,14 @@ public class SmartStartupService {
      * 服务类型枚举
      */
     public enum ServiceType {
-        TOTAL(TOTAL_SYSTEM_PROMPT),
-        ENTREPRENEURSHIP_TYPES(ENTREPRENEURSHIP_TYPES_SYSTEM_PROMPT),
-        CREATIVE_STAGE(CREATIVE_STAGE_SYSTEM_PROMPT),
-        BUSINESS_PLAN(BUSINESS_PLAN_SYSTEM_PROMPT),
-        MARKET_ANALYSIS(MARKET_ANALYSIS_SYSTEM_PROMPT),
-        BRAND_AND_COPYWRITING(BRAND_AND_COPYWRITING_SYSTEM_PROMPT),
-        REGISTRATION_PREPARATION(REGISTRATION_PREPARATION_SYSTEM_PROMPT),
-        COMPANY_ESTABLISHMENT(COMPANY_ESTABLISHMENT_SYSTEM_PROMPT);
+        TOTAL(Prompt.TOTAL_SYSTEM_PROMPT),
+        ENTREPRENEURSHIP_TYPES(Prompt.ENTREPRENEURSHIP_TYPES_SYSTEM_PROMPT),
+        CREATIVE_STAGE(Prompt.CREATIVE_STAGE_SYSTEM_PROMPT),
+        BUSINESS_PLAN(Prompt.BUSINESS_PLAN_SYSTEM_PROMPT),
+        MARKET_ANALYSIS(Prompt.MARKET_ANALYSIS_SYSTEM_PROMPT),
+        BRAND_AND_COPYWRITING(Prompt.BRAND_AND_COPYWRITING_SYSTEM_PROMPT),
+        REGISTRATION_PREPARATION(Prompt.REGISTRATION_PREPARATION_SYSTEM_PROMPT),
+        COMPANY_ESTABLISHMENT(Prompt.COMPANY_ESTABLISHMENT_SYSTEM_PROMPT);
 
         private final String systemPrompt;
 
@@ -142,6 +144,28 @@ public class SmartStartupService {
         String content = response.getResult().getOutput().getText();
         log.info("content: {}", content);
         return content;
+    }
+
+    /**
+     * 流式调用对话方法
+     * @param serviceType
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public Flux<String> doChatByStream(ServiceType serviceType, String message, String chatId) {
+            ChatClient chatClient = getChatClient(serviceType);
+
+            return chatClient
+                    .prompt()
+                    .user(message)
+                    .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId) // 指定对话 ID
+                            .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10)) // 指定记忆大小
+                    .advisors(new MyLoggerAdvisor()) // 添加日志记录 Advisor
+                    .tools(toolCallbackProvider) // mcp 工具回调
+                .tools(allTools) // 注册工具回调
+                .stream()
+                .content();
     }
 
 
