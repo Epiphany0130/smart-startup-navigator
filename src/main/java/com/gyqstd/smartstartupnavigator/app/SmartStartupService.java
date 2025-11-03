@@ -111,8 +111,13 @@ public class SmartStartupService {
         };
     }
 
+    // tools
     @Resource
     private ToolCallback[] allTools;
+
+    // mcp
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider;
 
     /**
      * 对话方法
@@ -130,6 +135,7 @@ public class SmartStartupService {
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId) // 指定对话 ID
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10)) // 指定记忆大小
                 .advisors(new MyLoggerAdvisor()) // 添加日志记录 Advisor
+                .tools(toolCallbackProvider) // mcp 工具回调
                 .tools(allTools) // 注册工具回调
                 .call()
                 .chatResponse();
@@ -137,6 +143,7 @@ public class SmartStartupService {
         log.info("content: {}", content);
         return content;
     }
+
 
 
 }

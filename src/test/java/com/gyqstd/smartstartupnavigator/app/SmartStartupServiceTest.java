@@ -33,4 +33,12 @@ class SmartStartupServiceTest {
         Assertions.assertNotNull(answer);
     }
 
+    @Test
+    void doChatWithMcp() {
+        String chatId = UUID.randomUUID().toString();
+        String message = "我要开一家汉服定制公司，你帮我找潍坊经济开发区民主街7777号潍坊理工学院(中心校区)附近适合公司落地的地点，请你调用高德地图搜索";
+        String answer = smartStartupService.doChat(SmartStartupService.ServiceType.COMPANY_ESTABLISHMENT, message, chatId);
+        Assertions.assertNotNull(answer);
+    }
+
 }
