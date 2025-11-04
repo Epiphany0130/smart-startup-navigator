@@ -107,7 +107,12 @@
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
             <version>1.0.0-M7</version>
         </dependency>
-
+<!--        SpringBoot3-mybaits-plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>3.5.14</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,13 +1,20 @@
 <template>
   <div class="wrap">
-    <header>
+    <header class="page-header">
       <h2>选择你的阶段与大模型</h2>
-      <p>点击任意卡片进入对应对话页面</p>
+      <p class="subtitle">选择任意阶段进入对应对话页面</p>
     </header>
-    <section class="grid">
-      <div v-for="item in items" :key="item.key" class="card" @click="go(item.path)">
-        <h3>{{ item.label }}</h3>
-        <p>{{ item.description }}</p>
+    <section class="journey-map">
+      <div class="journey-line"></div>
+      <div v-for="(item, index) in items" :key="item.key" 
+           class="stage-item" 
+           :class="{'stage-left': index % 2 === 0, 'stage-right': index % 2 !== 0}"
+           @click="go(item.path)">
+        <div class="stage-point"></div>
+        <div class="stage-content">
+          <h3>{{ item.label }}</h3>
+          <p>{{ item.description }}</p>
+        </div>
       </div>
     </section>
   </div>
@@ -30,23 +37,140 @@ const go = (path) => router.push(path);
 </script>
 
 <style scoped>
-.wrap { max-width: 1024px; margin: 0 auto; padding: 40px 20px; }
-header { margin-bottom: 16px; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+.wrap { 
+  max-width: 1024px; 
+  margin: 0 auto; 
+  padding: 60px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.card {
-  background: var(--panel);
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 16px;
+
+.page-header { 
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.page-header h2 {
+  font-size: 2.5rem;
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, var(--accent), #4ade80);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.journey-map {
+  position: relative;
+  padding: 20px 0;
+}
+
+.journey-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--accent), #4ade80);
+  transform: translateX(-50%);
+}
+
+.stage-item {
+  position: relative;
+  margin-bottom: 60px;
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }
-.card:hover { border-color: var(--accent); }
-h3 { margin: 0 0 8px; }
-p { margin: 0; opacity: 0.8; }
-@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+.stage-item:last-child {
+  margin-bottom: 0;
+}
+
+.stage-point {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.stage-item:hover .stage-point {
+  transform: translateX(-50%) scale(1.3);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+}
+
+.stage-content {
+  width: 42%;
+  background: var(--panel);
+  border: 1px solid rgba(31, 41, 55, 0.5);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stage-item:hover .stage-content {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stage-left .stage-content {
+  margin-right: auto;
+}
+
+.stage-right .stage-content {
+  margin-left: auto;
+}
+
+h3 { 
+  margin: 0 0 12px; 
+  font-size: 1.4rem;
+}
+
+p { 
+  margin: 0; 
+  opacity: 0.8; 
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .journey-line {
+    left: 30px;
+  }
+  
+  .stage-point {
+    left: 30px;
+  }
+  
+  .stage-content {
+    width: calc(100% - 60px);
+    margin-left: 60px !important;
+  }
+  
+  .stage-left, .stage-right {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .wrap {
+    padding: 40px 16px;
+  }
+}
 </style>
