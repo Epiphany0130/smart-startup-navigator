@@ -45,7 +45,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { api } from '../services/api';
+import { register as registerApi } from '../services/api';
 
 const router = useRouter();
 const userAccount = ref('');
@@ -80,17 +80,12 @@ const handleRegister = async () => {
     isLoading.value = true;
     errorMessage.value = '';
     
-    const response = await api.post('/user/register', {
-      userAccount: userAccount.value,
-      userPassword: userPassword.value,
-      checkPassword: checkPassword.value
-    });
-    
-    if (response.data && response.data.code === 0) {
+    const data = await registerApi(userAccount.value, userPassword.value, checkPassword.value);
+    if (data && data.code === 0) {
       // 注册成功，跳转到登录页
       router.push('/login');
     } else {
-      errorMessage.value = response.data?.message || '注册失败，请稍后再试';
+      errorMessage.value = data?.message || '注册失败，请稍后再试';
     }
   } catch (error) {
     console.error('注册错误:', error);

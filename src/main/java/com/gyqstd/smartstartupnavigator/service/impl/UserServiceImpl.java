@@ -16,7 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import static com.gyqstd.smartstartupnavigator.controller.UserConstant.USER_LOGIN_STATE;
+import static com.gyqstd.smartstartupnavigator.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现

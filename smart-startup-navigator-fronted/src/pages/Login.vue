@@ -37,10 +37,11 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { api } from '../services/api';
+import { useRouter, useRoute } from 'vue-router';
+import { login as loginApi } from '../services/api';
 
 const router = useRouter();
+const route = useRoute();
 const userAccount = ref('');
 const userPassword = ref('');
 const errorMessage = ref('');
@@ -67,22 +68,36 @@ const handleLogin = async () => {
     isLoading.value = true;
     errorMessage.value = '';
     
-    const response = await api.post('/user/login', {
-      userAccount: userAccount.value,
-      userPassword: userPassword.value
-    });
-    
-    if (response.data && response.data.code === 0) {
+    const data = await loginApi(userAccount.value, userPassword.value);
+    if (data && data.code === 0) {
       // 登录成功，存储用户信息
-      localStorage.setItem('userInfo', JSON.stringify(response.data.data));
+      localStorage.setItem('userInfo', JSON.stringify(data.data));
       // 跳转到首页或之前的页面
-      router.push('/models');
+      const redirect = route.query?.redirect;
+      router.push(typeof redirect === 'string' && redirect ? redirect : '/models');
     } else {
-      errorMessage.value = response.data?.message || '登录失败，请稍后再试';
+      errorMessage.value = data?.message || '登录失败，请稍后再试';
     }
   } catch (error) {
     console.error('登录错误:', error);
-    errorMessage.value = error.response?.data?.message || '登录失败，请检查网络连接';
+    const serverMsg = error?.response?.data?.message;
+    const status = error?.response?.status;
+    const reqUrl = error?.config?.url || '';
+    const isLoginReq = reqUrl.includes('/user/login');
+    if (isLoginReq) {
+      // 登录接口：无论 400/401/403/422 甚至 500，都更倾向提示“账号或密码错误”
+      const credentialStatuses = [400, 401, 403, 404, 422, 500];
+      if (credentialStatuses.includes(status)) {
+        errorMessage.value = serverMsg || '账号或密码错误';
+      } else if (error?.code === 'ERR_NETWORK') {
+        errorMessage.value = '网络异常，请稍后再试';
+      } else {
+        errorMessage.value = serverMsg || error?.message || '登录失败，请稍后再试';
+      }
+    } else {
+      // 非登录接口的兜底（当前页面不会触发到此分支，留作一致性）
+      errorMessage.value = serverMsg || error?.message || '请求失败，请稍后再试';
+    }
   } finally {
     isLoading.value = false;
   }

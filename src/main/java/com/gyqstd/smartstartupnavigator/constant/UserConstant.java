@@ -1,4 +1,4 @@
-package com.gyqstd.smartstartupnavigator.controller;
+package com.gyqstd.smartstartupnavigator.constant;
 
 /**
  * 用户常量

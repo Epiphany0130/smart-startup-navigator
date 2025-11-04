@@ -1,5 +1,8 @@
 <template>
   <div class="wrap">
+    <div class="topbar">
+      <button class="logout-btn" @click="doLogout">注销</button>
+    </div>
     <header class="page-header">
       <h2>选择你的阶段与大模型</h2>
       <p class="subtitle">选择任意阶段进入对应对话页面</p>
@@ -22,6 +25,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { logout } from '../services/api.js';
 import { STAGES } from '../constants/stages.js';
 const router = useRouter();
 const items = [
@@ -34,6 +38,7 @@ const items = [
   { ...STAGES['company-launch'], path: '/chat/company-launch' },
 ];
 const go = (path) => router.push(path);
+const doLogout = () => { logout(); router.replace('/login'); };
 </script>
 
 <style scoped>
@@ -45,6 +50,14 @@ const go = (path) => router.push(path);
   display: flex;
   flex-direction: column;
 }
+
+.topbar {
+  display: flex; justify-content: flex-end; margin-bottom: 12px;
+}
+.logout-btn {
+  background: var(--accent); color: #0b1c12; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+}
+.logout-btn:hover { filter: brightness(1.1); }
 
 .page-header { 
   margin-bottom: 60px;

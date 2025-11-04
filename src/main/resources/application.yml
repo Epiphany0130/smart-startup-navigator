@@ -19,11 +19,19 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/my_db
+    url: jdbc:mysql://localhost:3306/smart_startup_navigator
     username: root
     password: ${DATASOURCE_PASSWORD}
     type: com.zaxxer.hikari.HikariDataSource
 
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false  # 关闭驼峰转下划线
+  global-config:
+    db-config:
+      logic-delete-field: isDelete  # 直接使用驼峰字段名
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 server:
   port: 8456

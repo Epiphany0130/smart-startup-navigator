@@ -3,6 +3,7 @@
     <header class="chat-header">
       <h3>{{ title }}</h3>
       <small class="stage">阶段标识：{{ stage }}</small>
+      <div class="actions"><button class="logout-btn" @click="doLogout">注销</button></div>
     </header>
     <section class="messages" ref="messagesEl">
       <div v-for="(m, i) in messages" :key="i" :class="['msg', m.role]">
@@ -23,11 +24,13 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getSseUrl, sendSync } from '../services/api.js';
+import { logout } from '../services/api.js';
 import MarkdownIt from 'markdown-it';
 
 const route = useRoute();
+const router = useRouter();
 const stage = computed(() => route?.props?.stage || route?.params?.stage || route?.query?.stage || 'creative');
 const title = computed(() => route.meta?.title || '对话');
 
@@ -54,6 +57,13 @@ function closeSse() {
     try { eventSourceRef.value.close(); } catch {}
     eventSourceRef.value = null;
   }
+}
+
+function doLogout() {
+  // 关闭可能存在的 SSE 连接，清除登录信息并回到登录页
+  closeSse();
+  logout();
+  router.replace('/login');
 }
 
 async function send() {
@@ -136,6 +146,9 @@ onMounted(scrollToBottom);
 <style scoped>
 .chat-wrap { max-width: 960px; margin: 0 auto; padding: 20px; }
 .chat-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.actions { margin-left: auto; }
+.logout-btn { background: var(--accent); color: #0b1c12; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+.logout-btn:hover { filter: brightness(1.1); }
 .stage { opacity: 0.7; }
 .messages { background: var(--panel); border: 1px solid #1f2937; border-radius: 12px; min-height: 50vh; padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
 .msg { margin-bottom: 12px; display: flex; }

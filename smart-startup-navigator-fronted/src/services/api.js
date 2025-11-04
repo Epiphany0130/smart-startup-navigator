@@ -5,6 +5,11 @@ const BASE = 'http://localhost:8456/api'; // 后端上下文路径为 /api
 export const api = axios.create({
   baseURL: BASE,
   timeout: 20000,
+  // 跨域场景下携带后端会话 Cookie（如 Spring Session）
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // 请求拦截器，添加token
@@ -24,9 +29,16 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // 未登录或token过期，可以在这里处理重定向到登录页
-      window.location.href = '/login';
+    const status = error?.response?.status;
+    const reqUrl = error?.config?.url || '';
+    const skipRedirectPaths = ['/user/login', '/user/register'];
+    // 401 时仅在非登录/注册接口且当前不在登录页时重定向
+    if (status === 401) {
+      const shouldSkip = skipRedirectPaths.some(p => reqUrl.includes(p));
+      const alreadyOnLogin = typeof window !== 'undefined' && window.location?.pathname === '/login';
+      if (!shouldSkip && !alreadyOnLogin) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
